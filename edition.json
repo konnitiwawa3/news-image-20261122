@@ -1,0 +1,64 @@
+{
+  "summary": "Climate talks end without a pact. A Russian warship is hit in Libya. A factory fire kills workers in Java.",
+  "numbers": [
+    ["2 DAYS", "COP31 overtime"],
+    ["M 5.0", "Central Peru quake"],
+    ["3 DEAD", "Java factory fire, at least"],
+    ["29 DEAD", "Bayelsa toll rises"],
+    ["258 SEATS", "U.S. House Democrats, at least"]
+  ],
+  "leads": [
+    ["TURKIYE / CLIMATE", ["COP31 ends", "without a pact"], ["After two days of overtime in Antalya,", "delegates could not agree on an overall deal.", "The draft omitted a fossil-fuel transition."], "UN CLIMATE CHANGE / AP"],
+    ["LIBYA / WORLD", ["Russian warship", "hit in Benghazi"], ["Libyan officials suspected Ukrainian", "sea drones had struck the corvette", "Merkury at a naval base."], "ASSOCIATED PRESS"],
+    ["INDONESIA / DISASTER", ["Fatal blaze at", "Java candy plant"], ["At least three workers died in Banten.", "Rescuers searched for dozens of", "workers still unaccounted for."], "ASSOCIATED PRESS"]
+  ],
+  "desk": [
+    ["World", "Deadly strike north of Kyiv", "An apartment block in Dymer was hit."],
+    ["Science", "M 5.0 quake shakes central Peru", "USGS located it near Carhuamayo."],
+    ["Civic", "South Korea minister resigns", "Exam cheating scandal prompts exit."],
+    ["Civic", "U.S. Democrats reach 258 seats", "A recount concession lifted the House tally."],
+    ["World", "Nigeria boat toll rises to 29", "Officials update the Bayelsa disaster toll."],
+    ["Civic", "Delta glitch delays U.S. flights", "The FAA briefly halted some Atlanta arrivals."],
+    ["Climate", "Flood threat on California coast", "Bay Area residents were urged to avoid travel."],
+    ["World", "Poland alleges Russian plots", "A Ukrainian-American rapper was targeted."]
+  ],
+  "market_label": "FRI 20 NOV / MARKET CLOSES & CMT",
+  "markets": [
+    ["S&P 500", "-3.7%"],
+    ["Nikkei 225", "-5.06%"],
+    ["ICE Brent", "$92.57/bbl"],
+    ["U.S. 10-year CMT", "4.92%"]
+  ],
+  "briefs": [
+    ["Diplomacy & Security", "World", [
+      "Israel opposition condemns settler raids",
+      "Houthis report airstrike in Sanaa",
+      "Attack damages Odesa power grid",
+      "UK minister calls for closer EU ties",
+      "India youth group warns Meta of protests",
+      "Kenya internet metering bill draws scrutiny",
+      "UN reports on Afghan women forced home",
+      "Lithuania denies role in Baltic ship strike"
+    ]],
+    ["Society & Technology", "Civic", [
+      "Tasmania police give update on island death",
+      "Sydney police suspect fatal hit-and-run",
+      "England hospitals face NHS savings drive",
+      "UK offshore balances exceed 1tn pounds",
+      "Red Cross calls for autonomous arms rules",
+      "Berlin arts site faces backlash over arms event",
+      "Measles report highlights Amish outreach",
+      "Jeffries open to bipartisan talks"
+    ]],
+    ["Sport", "Culture", [
+      "Verstappen wins in Las Vegas",
+      "Alcaraz takes first season-finals title",
+      "Marquez secures eighth premier-class title",
+      "Liverpool beat Manchester United 4-0",
+      "Barcelona rally to beat Villarreal 3-2",
+      "Tottenham women beat Manchester City 3-1",
+      "Gerwyn Price wins in Wolverhampton",
+      "Mets reportedly agree deal with Skubal"
+    ]]
+  ]
+}
