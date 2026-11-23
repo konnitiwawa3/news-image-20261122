@@ -1,91 +1,176 @@
 {
-  "summary": "Russia's drone barrage hits Ukraine. Climate talks fail. Bahrain disputes Iran's radar claim.",
-  "regions": [
-    ["EUROPE", "blue"], ["MIDDLE EAST", "red"], ["ASIA", "teal"],
-    ["AMERICAS", "purple"], ["AFRICA", "orange"], ["OCEANIA", "cyan"], ["WORLD", "neutral"]
+  "digest": "Russia's drone barrage hits Ukraine. Climate talks fail. Bahrain disputes Iran's radar claim.",
+  "desks": {
+    "EUROPE": "blue",
+    "MIDDLE EAST": "red",
+    "ASIA": "teal",
+    "AMERICAS": "purple",
+    "AFRICA": "orange",
+    "OCEANIA": "cyan",
+    "WORLD": "neutral"
+  },
+  "indicators": [
+    {"article": "01", "figure": "186", "caption": "Russian drones launched"},
+    {"article": "01", "figure": "161", "caption": "Downed or suppressed"},
+    {"article": "02", "figure": "2 DAYS", "caption": "COP31 in overtime"},
+    {"article": "06", "figure": "856", "caption": "Hong Kong candidates"},
+    {"article": "09", "figure": "720/9", "caption": "India's Test record in NZ"},
+    {"article": "10", "figure": "29", "caption": "Bayelsa death toll update"}
   ],
-  "numbers": [
-    ["186", "Russian drones launched", "01"],
-    ["161", "Downed or suppressed", "01"],
-    ["2 DAYS", "COP31 in overtime", "02"],
-    ["856", "Hong Kong candidates", "06"],
-    ["720/9", "India's Test record in NZ", "09"],
-    ["29", "Bayelsa death toll update", "10"]
-  ],
-  "timeline": [
-    ["01:00", "Hong Kong polls open", "06"],
-    ["04:14", "Java fire reported", "04"],
-    ["05:52", "M5.0 quake in Peru", "11"],
-    ["07:52", "Bahrain denies claim", "03"],
-    ["12:14", "Kyiv strike reported", "01"],
-    ["15:28", "Benghazi strike report", "05"]
-  ],
-  "leads": [
+  "clock": {
+    "01:00": ["Hong Kong polls open", "06"],
+    "04:14": ["Java fire reported", "04"],
+    "05:52": ["M5.0 quake in Peru", "11"],
+    "07:52": ["Bahrain denies claim", "03"],
+    "12:14": ["Kyiv strike reported", "01"],
+    "15:28": ["Benghazi strike report", "05"]
+  },
+  "front": [
     {
-      "region": "EUROPE", "place": "KYIV REGION, UKRAINE", "tag": "REPORTED",
-      "headline": ["Russia sends 186", "drones into Ukraine"],
-      "detail": ["Ukraine says it downed or suppressed 161.", "A strike hit a five-storey block in Dymer."],
-      "source": "UKRAINIAN AIR FORCE / AP", "scene": "dymer",
-      "map": [30.3, 50.8, 17, -16]
+      "art": "dymer",
+      "desk": "EUROPE",
+      "dateline": "KYIV REGION, UKRAINE",
+      "status": "REPORTED",
+      "display": ["Russia sends 186", "drones into Ukraine"],
+      "deck": [
+        "Ukraine says it downed or suppressed 161.",
+        "A strike hit a five-storey block in Dymer."
+      ],
+      "credit": "UKRAINIAN AIR FORCE / AP",
+      "locator": {"point": [30.3, 50.8], "offset": [17, -16]}
     },
     {
-      "region": "WORLD", "place": "ANTALYA, TURKIYE", "tag": "REPORTED",
-      "headline": ["COP31 ends without", "a main agreement"],
-      "detail": ["The final draft omitted fossil fuels.", "Delegates failed to adopt it."],
-      "source": "UN CLIMATE CHANGE / AP", "scene": "summit",
-      "map": [30.7, 36.9, -19, 7]
+      "art": "summit",
+      "desk": "WORLD",
+      "dateline": "ANTALYA, TURKIYE",
+      "status": "REPORTED",
+      "display": ["COP31 ends without", "a main agreement"],
+      "deck": [
+        "The final draft omitted fossil fuels.",
+        "Delegates failed to adopt it."
+      ],
+      "credit": "UN CLIMATE CHANGE / AP",
+      "locator": {"point": [30.7, 36.9], "offset": [-19, 7]}
     },
     {
-      "region": "MIDDLE EAST", "place": "BAHRAIN", "tag": "DISPUTED",
-      "headline": ["Bahrain rejects", "Iran's radar claim"],
-      "detail": ["Iran claimed two US radar hits. Bahrain", "said a civilian site was hit on Saturday."],
-      "source": "BAHRAIN MFA / KHALEEJ TIMES", "scene": "radar",
-      "map": [50.5, 26, 17, 15]
+      "art": "radar",
+      "desk": "MIDDLE EAST",
+      "dateline": "BAHRAIN",
+      "status": "DISPUTED",
+      "display": ["Bahrain rejects", "Iran's radar claim"],
+      "deck": [
+        "Iran claimed two US radar hits. Bahrain",
+        "said a civilian site was hit on Saturday."
+      ],
+      "credit": "BAHRAIN MFA / KHALEEJ TIMES",
+      "locator": {"point": [50.5, 26], "offset": [17, 15]}
     }
   ],
-  "cards": [
-    ["ASIA", "JAVA", "REPORTED", ["Candy plant fire", "kills at least three"], "Dozens unaccounted for", "AP", "factory", [106.1, -6.1, 5, 11]],
-    ["AFRICA", "LIBYA", "REPORTED", ["Russian warship", "hit in Benghazi"], "Libya suspects sea drones", "AP", "ship", [20.1, 32.1, -19, 21]],
-    ["ASIA", "HONG KONG", "OFFICIAL", ["Election committee", "goes to the polls"], "856 vie for 723 seats", "HK GOV", "ballot", [114.2, 22.3, 12, -9]],
-    ["ASIA", "SOUTH KOREA", "REPORTED", ["Education minister", "resigns over scandal"], "Exam cheating prompts exit", "GUARDIAN", "exam", [127.0, 37.5, 12, -12]],
-    ["AMERICAS", "LAS VEGAS", "OFFICIAL", ["Red Bull wins", "the Las Vegas GP"], "Wins by 0.639 seconds", "FIA", "racing", [-115.1, 36.1, -9, -10]],
-    ["OCEANIA", "WELLINGTON", "REPORTED", ["India declare on", "a record 720/9"], "Highest Test total in NZ", "AFP", "cricket", [174.8, -41.3, -10, -13]],
-    ["AFRICA", "NIGERIA", "UPDATE", ["Bayelsa boat toll", "rises to 29"], "Updated toll on Sunday", "CHANNELS TV", "boat", [6.2, 4.8, -11, 14]],
-    ["AMERICAS", "PERU", "OFFICIAL", ["M5.0 quake shakes", "central Peru"], "Near Carhuamayo", "USGS", "quake", [-76.0, -10.9, -13, 11]],
-    ["AMERICAS", "UNITED STATES", "UPDATE", ["House Democrats", "reach 258 seats"], "Recount concession", "GUARDIAN", "capitol", [-80.3, 36.1, 7, -12]],
-    ["AMERICAS", "ATLANTA", "REPORTED", ["Delta outage", "delays US flights"], "FAA paused some arrivals", "AP", "flight", [-84.4, 33.6, 5, 12]],
-    ["AMERICAS", "CALIFORNIA", "FORECAST", ["Flood warning", "for California coast"], "Bay Area travel advisory", "LA TIMES", "flood", null],
-    ["EUROPE", "POLAND", "CLAIM", ["Poland alleges", "Russian plots"], "Rapper among the targets", "AP", "poland", null]
+  "illustrated": [
+    {
+      "art": "factory", "desk": "ASIA", "dateline": "JAVA", "status": "REPORTED",
+      "display": ["Candy plant fire", "kills at least three"],
+      "deck": "Dozens unaccounted for", "credit": "AP",
+      "locator": {"point": [106.1, -6.1], "offset": [5, 11]}
+    },
+    {
+      "art": "ship", "desk": "AFRICA", "dateline": "LIBYA", "status": "REPORTED",
+      "display": ["Russian warship", "hit in Benghazi"],
+      "deck": "Libya suspects sea drones", "credit": "AP",
+      "locator": {"point": [20.1, 32.1], "offset": [-19, 21]}
+    },
+    {
+      "art": "ballot", "desk": "ASIA", "dateline": "HONG KONG", "status": "OFFICIAL",
+      "display": ["Election committee", "goes to the polls"],
+      "deck": "856 vie for 723 seats", "credit": "HK GOV",
+      "locator": {"point": [114.2, 22.3], "offset": [12, -9]}
+    },
+    {
+      "art": "exam", "desk": "ASIA", "dateline": "SOUTH KOREA", "status": "REPORTED",
+      "display": ["Education minister", "resigns over scandal"],
+      "deck": "Exam cheating prompts exit", "credit": "GUARDIAN",
+      "locator": {"point": [127.0, 37.5], "offset": [12, -12]}
+    },
+    {
+      "art": "racing", "desk": "AMERICAS", "dateline": "LAS VEGAS", "status": "OFFICIAL",
+      "display": ["Red Bull wins", "the Las Vegas GP"],
+      "deck": "Wins by 0.639 seconds", "credit": "FIA",
+      "locator": {"point": [-115.1, 36.1], "offset": [-9, -10]}
+    },
+    {
+      "art": "cricket", "desk": "OCEANIA", "dateline": "WELLINGTON", "status": "REPORTED",
+      "display": ["India declare on", "a record 720/9"],
+      "deck": "Highest Test total in NZ", "credit": "AFP",
+      "locator": {"point": [174.8, -41.3], "offset": [-10, -13]}
+    },
+    {
+      "art": "boat", "desk": "AFRICA", "dateline": "NIGERIA", "status": "UPDATE",
+      "display": ["Bayelsa boat toll", "rises to 29"],
+      "deck": "Updated toll on Sunday", "credit": "CHANNELS TV",
+      "locator": {"point": [6.2, 4.8], "offset": [-11, 14]}
+    },
+    {
+      "art": "quake", "desk": "AMERICAS", "dateline": "PERU", "status": "OFFICIAL",
+      "display": ["M5.0 quake shakes", "central Peru"],
+      "deck": "Near Carhuamayo", "credit": "USGS",
+      "locator": {"point": [-76.0, -10.9], "offset": [-13, 11]}
+    },
+    {
+      "art": "capitol", "desk": "AMERICAS", "dateline": "UNITED STATES", "status": "UPDATE",
+      "display": ["House Democrats", "reach 258 seats"],
+      "deck": "Recount concession", "credit": "GUARDIAN",
+      "locator": {"point": [-80.3, 36.1], "offset": [7, -12]}
+    },
+    {
+      "art": "flight", "desk": "AMERICAS", "dateline": "ATLANTA", "status": "REPORTED",
+      "display": ["Delta outage", "delays US flights"],
+      "deck": "FAA paused some arrivals", "credit": "AP",
+      "locator": {"point": [-84.4, 33.6], "offset": [5, 12]}
+    },
+    {
+      "art": "flood", "desk": "AMERICAS", "dateline": "CALIFORNIA", "status": "FORECAST",
+      "display": ["Flood warning", "for California coast"],
+      "deck": "Bay Area travel advisory", "credit": "LA TIMES",
+      "locator": null
+    },
+    {
+      "art": "poland", "desk": "EUROPE", "dateline": "POLAND", "status": "CLAIM",
+      "display": ["Poland alleges", "Russian plots"],
+      "deck": "Rapper among the targets", "credit": "AP",
+      "locator": null
+    }
   ],
-  "briefs": [
-    ["EUROPE", "REPORTED", "Attack damages Odesa power grid", "KYIV IND."],
-    ["EUROPE", "UPDATE", "UK urges closer EU ties", "GUARDIAN"],
-    ["EUROPE", "CLAIM", "Lithuania denies role in ship strike", "AP"],
-    ["EUROPE", "REPORTED", "NHS hospitals face cuts", "GUARDIAN"],
-    ["EUROPE", "REPORTED", "UK offshore assets top GBP 1tn", "GUARDIAN"],
-    ["EUROPE", "REPORTED", "Berlin arts venue faces arms-event row", "GUARDIAN"],
-    ["EUROPE", "OFFICIAL", "Spain takes Turin ATP singles title", "ATP"],
-    ["EUROPE", "REPORTED", "Ducati rider seals eighth MotoGP title", "REUTERS"],
-    ["EUROPE", "REPORTED", "Liverpool beat Man United 4-0", "GUARDIAN"],
-    ["EUROPE", "REPORTED", "Barcelona beat Villarreal 3-2", "GUARDIAN"],
-    ["EUROPE", "REPORTED", "Spurs women beat Man City 3-1", "GUARDIAN"],
-    ["MIDDLE EAST", "UPDATE", "Israeli opposition condemns settler raids", "AP"],
-    ["MIDDLE EAST", "CLAIM", "Houthis report airstrike in Sanaa", "AP"],
-    ["ASIA", "REPORTED", "India youth group warns Meta of protests", "REUTERS"],
-    ["ASIA", "REPORTED", "UN reports Afghan deportations from Iran", "UN NEWS"],
-    ["AMERICAS", "REPORTED", "Measles outreach focuses on Amish", "GUARDIAN"],
-    ["AMERICAS", "REPORTED", "US House minority leader open to talks", "CBS"],
-    ["AMERICAS", "REPORTED", "Mets said to agree deal with ace pitcher", "GUARDIAN"],
-    ["AFRICA", "REPORTED", "Kenya internet metering bill draws fire", "AL JAZEERA"],
-    ["OCEANIA", "OFFICIAL", "Tasmania police report death on island", "TAS POLICE"],
-    ["OCEANIA", "REPORTED", "Sydney police suspect fatal hit-and-run", "AAP"],
-    ["WORLD", "REPORTED", "Red Cross urges rules on autonomous arms", "GUARDIAN"]
+  "wire": [
+    {"desk": "EUROPE", "credit": "KYIV IND.", "status": "REPORTED", "line": "Attack damages Odesa power grid"},
+    {"desk": "EUROPE", "credit": "GUARDIAN", "status": "UPDATE", "line": "UK urges closer EU ties"},
+    {"desk": "EUROPE", "credit": "AP", "status": "CLAIM", "line": "Lithuania denies role in ship strike"},
+    {"desk": "EUROPE", "credit": "GUARDIAN", "status": "REPORTED", "line": "NHS hospitals face cuts"},
+    {"desk": "EUROPE", "credit": "GUARDIAN", "status": "REPORTED", "line": "UK offshore assets top GBP 1tn"},
+    {"desk": "EUROPE", "credit": "GUARDIAN", "status": "REPORTED", "line": "Berlin arts venue faces arms-event row"},
+    {"desk": "EUROPE", "credit": "ATP", "status": "OFFICIAL", "line": "Spain takes Turin ATP singles title"},
+    {"desk": "EUROPE", "credit": "REUTERS", "status": "REPORTED", "line": "Ducati rider seals eighth MotoGP title"},
+    {"desk": "EUROPE", "credit": "GUARDIAN", "status": "REPORTED", "line": "Liverpool beat Man United 4-0"},
+    {"desk": "EUROPE", "credit": "GUARDIAN", "status": "REPORTED", "line": "Barcelona beat Villarreal 3-2"},
+    {"desk": "EUROPE", "credit": "GUARDIAN", "status": "REPORTED", "line": "Spurs women beat Man City 3-1"},
+    {"desk": "MIDDLE EAST", "credit": "AP", "status": "UPDATE", "line": "Israeli opposition condemns settler raids"},
+    {"desk": "MIDDLE EAST", "credit": "AP", "status": "CLAIM", "line": "Houthis report airstrike in Sanaa"},
+    {"desk": "ASIA", "credit": "REUTERS", "status": "REPORTED", "line": "India youth group warns Meta of protests"},
+    {"desk": "ASIA", "credit": "UN NEWS", "status": "REPORTED", "line": "UN reports Afghan deportations from Iran"},
+    {"desk": "AMERICAS", "credit": "GUARDIAN", "status": "REPORTED", "line": "Measles outreach focuses on Amish"},
+    {"desk": "AMERICAS", "credit": "CBS", "status": "REPORTED", "line": "US House minority leader open to talks"},
+    {"desk": "AMERICAS", "credit": "GUARDIAN", "status": "REPORTED", "line": "Mets said to agree deal with ace pitcher"},
+    {"desk": "AFRICA", "credit": "AL JAZEERA", "status": "REPORTED", "line": "Kenya internet metering bill draws fire"},
+    {"desk": "OCEANIA", "credit": "TAS POLICE", "status": "OFFICIAL", "line": "Tasmania police report death on island"},
+    {"desk": "OCEANIA", "credit": "AAP", "status": "REPORTED", "line": "Sydney police suspect fatal hit-and-run"},
+    {"desk": "WORLD", "credit": "GUARDIAN", "status": "REPORTED", "line": "Red Cross urges rules on autonomous arms"}
   ],
-  "markets": [
-    ["S&P 500", "-3.7%"], ["NIKKEI 225", "-5.06%"],
-    ["ICE BRENT", "$92.57/bbl"], ["US 10Y CMT", "4.92%"]
-  ],
-  "date_check": [
+  "closing_quotes": {
+    "S&P 500": "-3.7%",
+    "NIKKEI 225": "-5.06%",
+    "ICE BRENT": "$92.57/bbl",
+    "US 10Y CMT": "4.92%"
+  },
+  "chronology_notes": [
     "LEFT OUT: Peru M6.7 quake (20 Nov local / 21 Nov UTC); EU-Indonesia trade signing (21 Nov); Hormuz swim report (21 Nov).",
     "Saturday's Bahrain strike and Bayelsa sinking are background. This edition carries Sunday's denial and updated death toll."
   ]
