@@ -9,22 +9,48 @@ from random import Random
 import struct
 import zlib
 
+from illustrations import SCENES, Scene
+
 
 ROOT = Path(__file__).resolve().parent
 SIDE = 1024
 SCALE = 3
 WIDTH = SIDE * SCALE
 PAPER = (246, 236, 213)
-INK = (
-    (0, 0, 0), (37, 37, 42), (88, 65, 62), (60, 72, 86),
-    (122, 108, 89), (203, 187, 153), (230, 217, 188),
-    (70, 55, 49), (63, 46, 49), (88, 65, 56),
-)
-CLIMATE, WORLD, CIVIC, SCIENCE, CULTURE = 2, 3, 3, 4, 4
-SECTION = {
-    "Climate": CLIMATE, "World": WORLD, "Civic": CIVIC,
-    "Science": SCIENCE, "Culture": CULTURE,
+# Astryx Stone Light palette stops used as print inks.
+SWATCHES = {
+    "neutral": ("25252a", "46464e", "919197", "f0f0f7"),
+    "red": ("381d19", "603c37", "d8ada6", "ffece9"),
+    "blue": ("17263a", "344861", "a4bbda", "e8f2ff"),
+    "teal": ("112b24", "2c4f44", "a1c1b6", "e6f5ef"),
+    "purple": ("2a2135", "4c405b", "beb2d2", "f4edff"),
+    "orange": ("36200d", "5e3f27", "d7b18d", "ffeddd"),
+    "cyan": ("0c2a31", "264d57", "99c1cb", "def6fc"),
 }
+
+# Additional halftone inks appear in the illustrations and newsprint.
+ART_INKS = {
+    "paper": "f8efd9", "rule": "c5b68f", "faint": "e7dac0",
+    "warm": "70554a", "wear1": "463731", "wear2": "3f2e31", "wear3": "584138",
+    "night": "182335", "night2": "2c3b50", "slate": "596c7b",
+    "steel": "899da6", "sky": "bacccd", "mist": "d4dcd1",
+    "sun": "e4ba61", "sand": "ccae7a", "umber": "8e6e55",
+    "rust": "a04d38", "flame": "d77846", "brick": "743c35",
+    "ocean": "416e78", "pine": "3c6559", "leaf": "729179",
+    "grass": "a8aa74", "cream": "eee5c9", "white": "fbf7ed",
+}
+ink_values = dict(ART_INKS)
+for hue, colors in SWATCHES.items():
+    for stop, value in zip((15, 30, 75, 95), colors, strict=True):
+        ink_values[f"{hue}{stop}"] = value
+PALETTE = {name: index for index, name in enumerate(ink_values, 1)}
+INK = (None, *(tuple(bytes.fromhex(value)) for value in ink_values.values()))
+BLACK = PALETTE["neutral15"]
+RED = PALETTE["red30"]
+MUTED = PALETTE["blue30"]
+RULE = PALETTE["rule"]
+FAINT = PALETTE["faint"]
+WHITE = PALETTE["white"]
 
 
 class Press:
@@ -46,7 +72,7 @@ class Press:
                     points.append((round(bearing * horizontal) + col, round(top * vertical) + row))
         return points
 
-    def text(self, value, face, x, y, size=1, stretch=1, align=0, ink=1, wear=False, limit=None):
+    def text(self, value, face, x, y, size=1, stretch=1, align=0, ink=BLACK, wear=False, limit=None):
         units = self.fonts[face]
         step = [round(units[c][0] * size * stretch) for c in value]
         length = sum(step) / SCALE
@@ -58,7 +84,7 @@ class Press:
         baseline = round(y * SCALE)
         for index, (char, advance) in enumerate(zip(value, step, strict=True)):
             seed = (2654435761 * (20261122 + cursor + baseline * 1031 + index * 29)) & 0xffffffff
-            tint = 7 + (seed >> 8) % 3 if wear and ink == 1 else ink
+            tint = PALETTE[f"wear{1 + (seed >> 8) % 3}"] if wear else ink
             for dx, dy in self.stencil(face, char, size * stretch, size):
                 xx, yy = cursor + dx, baseline + dy
                 if 0 <= xx < WIDTH and 0 <= yy < WIDTH:
@@ -68,7 +94,7 @@ class Press:
                     if wear and yy + 2 < WIDTH and (seed + xx * 7 + yy) % 31 < 3:
                         spot = (yy + 2) * WIDTH + xx
                         if not self.plate[spot]:
-                            self.plate[spot] = 5
+                            self.plate[spot] = RULE
             cursor += advance
         return length
 
@@ -80,7 +106,7 @@ class Press:
         for row in range(top, bottom):
             self.plate[row * WIDTH + left:row * WIDTH + right] = fill
 
-    def path(self, points, ink=1, weight=1):
+    def path(self, points, ink=BLACK, weight=1):
         for (ax, ay), (bx, by) in zip(points, points[1:]):
             steps = max(1, round(max(abs(bx - ax), abs(by - ay)) * SCALE))
             for i in range(steps + 1):
@@ -88,84 +114,18 @@ class Press:
                 y = ay + (by - ay) * i / steps
                 self.box(x - weight / 2, y - weight / 2, weight, weight, ink)
 
-    def ellipse(self, x, y, rx, ry, ink=1, weight=1):
+    def ellipse(self, x, y, rx, ry, ink=BLACK, weight=1):
         points = [(x + rx * math.cos(i * math.pi / 48), y + ry * math.sin(i * math.pi / 48))
                   for i in range(97)]
         self.path(points, ink, weight)
 
-    def rule(self, x, y, width, ink=1, weight=1):
+    def rule(self, x, y, width, ink=BLACK, weight=1):
         self.box(x, y, width, weight, ink)
 
-    def frame(self, x, y, w, h, ink=5):
+    def frame(self, x, y, w, h, ink=RULE):
         self.path(((x,y),(x+w,y),(x+w,y+h),(x,y+h),(x,y)), ink, .8)
 
 
-def chart_ground(p, x, y, w, h):
-    p.frame(x, y, w, h)
-    for gy in range(y + 7, y + h - 1, 9):
-        for gx in range(x + 7, x + w - 1, 8):
-            p.box(gx, gy, .65, .65, 5)
-
-
-def climate_plate(p, x, y, w, h):
-    chart_ground(p, x, y, w, h)
-    gx, gy = x + 75, y + 64
-    p.ellipse(gx, gy, 49, 48, 3, 1.5)
-    p.ellipse(gx, gy, 25, 48, 3)
-    p.ellipse(gx, gy, 49, 17, 3)
-    p.path(((gx,gy-48),(gx,gy+48)), 3)
-    p.path(((gx-48,gy),(gx+48,gy)), 3)
-    p.box(gx+72, y+16, w-166, h-32, 6)
-    right = x + w - 19
-    left = gx + 83
-    p.frame(left, y+21, right-left, h-42, 4)
-    p.text("DRAFT AGREEMENT", "news12", left+9, y+41, 1.03, ink=4, limit=right-left-18)
-    for line in (49, 56, 91, 98):
-        p.rule(left+9, y+line, right-left-18, 5, .8)
-    p.text("FOSSIL FUELS", "display22", left+9, y+78, .88, ink=2, limit=right-left-18)
-    p.path(((left+6,y+69),(right-10,y+69)), 2, 1.5)
-    for i in range(5):
-        p.path(((gx-47+i*8,gy+51),(gx-32+i*8,gy+56)), 3, .8)
-
-
-def ship_plate(p, x, y, w, h):
-    chart_ground(p, x, y, w, h)
-    sx, sy = x + 17, y + 86
-    hull = ((0,0),(w-34,0),(w-61,23),(25,23),(0,0))
-    p.path([(sx+a,sy+b) for a,b in hull], 3, 2)
-    for i in range(18, w-56, 7):
-        p.path(((sx+i,sy+3),(sx+i+13,sy+17)), 3, .8)
-    p.path(((sx+42,sy),(sx+51,sy-17),(sx+83,sy-17),(sx+94,sy-32),
-            (sx+115,sy-32),(sx+127,sy-18),(sx+156,sy-18),(sx+174,sy)), 3, 1.55)
-    p.path(((sx+100,sy-32),(sx+100,sy-56),(sx+112,sy-56)), 3, 1.25)
-    for j in range(3):
-        p.path(((sx+20+j*7,sy+31+j*5),(sx+w-39-j*11,sy+31+j*5)), 3, .7)
-    for j in range(4):
-        p.path(((sx+160+j*5,sy-22),(sx+155+j*9,sy-35),
-                (sx+174+j*7,sy-48),(sx+184+j*8,sy-58)), 2, 1.1)
-    p.text("BENGHAZI NAVAL BASE", "news12", x+10, y+16, .88, ink=3)
-
-
-def factory_plate(p, x, y, w, h):
-    chart_ground(p, x, y, w, h)
-    sx, sy = x+22, y+103
-    right = x+w-22
-    p.path(((sx,sy),(sx,sy-36),(sx+26,sy-55),(sx+26,sy-36),
-            (sx+60,sy-55),(sx+60,sy-36),(sx+94,sy-55),(sx+94,sy-36),
-            (right,sy-36),(right,sy),(sx,sy)), 3, 1.55)
-    for i in range(5):
-        p.frame(sx+12+29*i,sy-29,18,12,3)
-    for i in range(0, w-49, 6):
-        p.path(((sx+i,sy-10),(sx+i+4,sy-4)), 3, .7)
-    p.path(((right-39,sy-38),(right-39,sy-77),(right-20,sy-77),(right-20,sy-38)), 3, 1.3)
-    for j in range(4):
-        p.path(((right-30+j*3,sy-79),(right-40+j*6,sy-91),(right-26+j*5,sy-102)), 2, 1.0)
-    p.rule(x+16, y+113, w-32, 3, .7)
-    p.text("BANTEN, JAVA", "news12", x+10, y+17, .88, ink=3)
-
-
-FIGURES = (climate_plate, ship_plate, factory_plate)
-# Simplified coastlines in longitude/latitude, used only to locate the numbered reports.
 COASTS = (
     ((-166,64),(-146,60),(-129,54),(-124,46),(-117,32),(-101,20),(-88,18),(-83,10),
      (-77,8),(-81,21),(-90,28),(-82,30),(-76,37),(-65,46),(-57,52),(-67,58),(-59,64),
@@ -184,122 +144,209 @@ COASTS = (
      (131,-31),(115,-34),(112,-22)),
     ((132,34),(137,36),(141,42),(143,45)), ((166,-45),(172,-42),(178,-36)),
 )
-MAP_LOCATIONS = (
-    ("01", 30.7, 36.9, 16, -14), ("02", 20.1, 32.1, -14, 14),
-    ("03", 106.1, -6.1, 14, 13), ("04", 30.5, 50.4, 15, -22),
-    ("05", -76.0, -10.9, 3, 16), ("06", 127.0, 37.5, 13, -12),
-    ("08", 6.2, 4.8, -5, 12), ("09", -84.4, 33.6, -13, -13),
-)
 
 
-def world_map(p):
-    x, y, width, height = 688, 531, 304, 105
-    p.frame(x, y, width, height)
-    p.text("WORLD MAP", "news12", x+8, y+14, 1.05, ink=3)
-    p.text("NUMBERS MATCH STORIES", "news12", x+width-8, y+14, .86, align=1, ink=4)
+LEFT = 30
+RIGHT = 994
+PAGE = RIGHT - LEFT
+
+
+def number_tag(p, number, x, y, ink, width=19):
+    p.box(x, y, width, 13, ink)
+    p.text(f"{number:02d}", "news12", x+width/2, y+10, .85, align=.5, ink=WHITE)
+
+
+def measure(p, value, face, size):
+    units = p.fonts[face]
+    return sum(round(units[char][0]*size) for char in value) / SCALE
+
+
+def headline(p, lines, x, y, width, size, line_height, face):
+    longest = max(measure(p, line, face, size) for line in lines)
+    stretch = min(1, (width-1)/longest)
+    for index, line in enumerate(lines):
+        p.text(line, face, x, y + index*line_height, size, stretch=stretch)
+
+
+def masthead(p, edition, counts, colors):
+    p.rule(LEFT, 20, PAGE, BLACK, 2)
+    p.text("THE WORLD DISPATCH", "display22", LEFT, 43, 1, ink=RED)
+    p.text(f"SUNDAY EDITION   /   {sum(counts.values())} STORIES   /   {len(counts)} REGIONS",
+           "news12", RIGHT, 42, .97, align=1, ink=MUTED)
+    p.rule(LEFT, 49, PAGE, RULE, .85)
+    p.text("22 NOVEMBER 2026", "display55", 512, 111, 1.39, 1.0, .5, wear=True, limit=PAGE)
+    p.text(edition["summary"], "news14", 512, 135, 1.16, align=.5, limit=PAGE)
+    p.rule(LEFT, 145, PAGE, BLACK, 1.35)
+
+    width = PAGE / len(edition["numbers"])
+    for i, (value, label, story) in enumerate(edition["numbers"]):
+        x = LEFT + i*width
+        if i:
+            p.box(x, 153, .7, 40, RULE)
+        p.text(value, "display27", x+width/2, 174, 1.07, align=.5, ink=RED, limit=width-8)
+        p.text(f"{story}  /  {label}", "news12", x+width/2, 189, .91, align=.5,
+               ink=MUTED, limit=width-9)
+
+    width = PAGE / len(colors)
+    for i, (region, color) in enumerate(colors.items()):
+        x = LEFT+i*width
+        p.box(x, 201, width, 20, color)
+        p.text(f"{region}  {counts[region]}", "news12", x+width/2, 215, 1.02, align=.5, ink=WHITE)
+
+    p.box(LEFT, 226, PAGE, 19, PALETTE["paper"])
+    p.rule(LEFT, 226, PAGE, RULE, .8)
+    p.rule(LEFT, 244, PAGE, RULE, .8)
+    p.text("UTC", "news12", LEFT+8, 239.3, 1.06, ink=RED)
+    step = (PAGE-49) / len(edition["timeline"])
+    for i, (hour, title, story) in enumerate(edition["timeline"]):
+        x = LEFT + 49 + i*step
+        p.box(x-4, 230, .6, 10, RULE)
+        p.text(hour, "news12", x+1, 239, .91, ink=RED)
+        p.text(title, "news12", x+38, 239, .85, ink=BLACK, limit=step-43)
+
+
+def leading_stories(p, edition, colors):
+    for index, (row, (x,w)) in enumerate(zip(edition["leads"],
+                                            ((30,402),(448,265),(729,265)), strict=True), 1):
+        stop = colors[row["region"]]
+        p.rule(x, 254, w, stop, 2)
+        SCENES[row["scene"]](Scene(p, PALETTE, x, 256, w, 102))
+        number_tag(p, index, x, 256, stop, width=24)
+        if index == 3:
+            for start, label in ((x+6, "IRAN'S CLAIM"), (x+w/2+5, "BAHRAIN'S ACCOUNT")):
+                p.box(start, 341, 103, 13, PALETTE["paper"])
+                p.text(label, "news12", start+5, 350.5, .78, ink=RED)
+        p.text(row["place"], "news12", x, 375, 1.03, ink=stop)
+        p.text(row["tag"], "news12", x+w, 375, .89, align=1, ink=stop)
+        headline(p, row["headline"], x, 405 if index == 1 else 406, w,
+                 .70 if index == 1 else 1.05, 33 if index == 1 else 26,
+                 "display55" if index == 1 else "display27")
+        for line, detail in enumerate(row["detail"]):
+            p.text(detail, "news14", x, 459+line*15, 1.02, limit=w)
+        p.text(row["source"], "news12", x, 489, .91, ink=MUTED, limit=w)
+        if index < 3:
+            p.box(x+w+7, 254, .8, 235, RULE)
+
+
+def illustrated_desk(p, edition, colors):
+    p.rule(LEFT, 499, PAGE, BLACK, 1.3)
+    p.text("Around the World", "display22", LEFT, 520, .98)
+    p.text("ILLUSTRATED REPORTS 04-15", "news12", RIGHT, 519, .92, align=1, ink=MUTED)
+    width = (PAGE-5*10)/6
+    for index, (region, place, tag, title, detail, source, scene, loc) in enumerate(edition["cards"]):
+        row, col = divmod(index, 6)
+        x, y = LEFT+col*(width+10), 529+row*103
+        color = colors[region]
+        p.rule(x, y, width, color, 2)
+        SCENES[scene](Scene(p, PALETTE, x, y+2, width, 36))
+        number_tag(p, index+4, x, y+2, color)
+        p.text(place, "news12", x, y+49, .86, ink=color)
+        headline(p, title, x, y+64, width, .73, 14, "display22")
+        p.text(detail, "news12", x, y+89, .86, limit=width)
+        p.text(f"{tag}  /  {source}", "news12", x, y+99, .75, ink=MUTED, limit=width)
+
+
+def point_in_coast(lon, lat, coast):
+    if len(coast) < 4 or coast[0] != coast[-1]:
+        return False
+    return sum(
+        min(lat1, lat2) <= lat < max(lat1, lat2)
+        and lon < lon1 + (lon2-lon1)*(lat-lat1)/(lat2-lat1)
+        for (lon1, lat1), (lon2, lat2) in zip(coast, coast[1:])
+    ) % 2
+
+
+def world_map(p, edition, colors):
+    x, y, w, h = LEFT, 741, 313, 179
+    p.box(x, y, w, h, PALETTE["night"])
+    p.text("WORLD MAP", "display22", x+9, y+20, .85, ink=WHITE)
+    p.text("PINS MATCH STORY NUMBERS", "news12", x+w-9, y+19, .77, ink=PALETTE["sky"], align=1)
+    p.rule(x+9, y+25, w-18, PALETTE["slate"], .7)
 
     def project(lon, lat):
-        return x + 11 + (lon + 180) * (width - 22) / 360, y + 21 + (83 - lat) * .52
+        return x+13+(lon+180)*(w-26)/360, y+33+(84-lat)*.91
 
-    for lat in (-30, 0, 30, 60):
-        p.path((project(-178,lat), project(178,lat)), 6, .65)
-    for coast in COASTS:
-        p.path(tuple(project(lon,lat) for lon,lat in coast), 4, .88)
-    for number, lon, lat, dx, dy in MAP_LOCATIONS:
-        xx, yy = project(lon, lat)
-        p.path(((xx,yy),(xx+dx*.78,yy+dy*.78)), 2, .65)
-        p.box(xx-1.5, yy-1.5, 3, 3, 2)
-        p.box(xx+dx-7, yy+dy-5, 14, 10, 6)
-        p.text(number, "news12", xx+dx, yy+dy+3, .81, align=.5, ink=2)
+    for lat in range(-56, 84, 4):
+        for lon in range(-176, 180, 4):
+            if any(point_in_coast(lon, lat, coast) for coast in COASTS):
+                px, py = project(lon, lat)
+                p.box(px-.78, py-.72, 1.56, 1.44, PALETTE["blue75"])
+    for lon, lat in ((106,-7),(115,-8),(120,-9),(124,-4),(136,35),(140,39),(144,44),
+                     (171,-43),(175,-39),(178,-37),(48,-19)):
+        px, py = project(lon, lat)
+        p.box(px-.85, py-.85, 1.7, 1.7, PALETTE["blue75"])
+
+    sites = [(row["region"], row["map"]) for row in edition["leads"]]
+    sites.extend((row[0],row[-1]) for row in edition["cards"])
+    pins = []
+    for number, (region, location) in enumerate(sites, 1):
+        if location is None:
+            continue
+        lon,lat,dx,dy = location
+        px,py = project(lon,lat)
+        p.path(((px,py),(px+dx,py+dy)), PALETTE["sky"], .7)
+        p.box(px-1,py-1,2,2,WHITE)
+        pins.append((number,px+dx,py+dy,colors[region]))
+    for number, px, py, color in pins:
+        p.box(px-8.5,py-6.5,17,13,PALETTE["cream"])
+        p.box(px-7.5,py-5.5,15,11,color)
+        p.text(f"{number:02d}", "news12", px, py+3.1, .74, align=.5, ink=WHITE)
+    p.text("SELECTED LOCATIONS  /  NOT TO SCALE", "news12", x+9, y+h-7, .78, ink=PALETTE["sky"])
 
 
-def desk_mark(p, x, y, index, ink):
-    marks = (
-        ((0,9),(6,3),(12,9),(12,17),(0,17),(0,9),(12,9)),
-        ((0,12),(4,12),(7,4),(10,17),(13,7),(16,12),(21,12)),
-        ((1,4),(19,4),(19,17),(1,17),(1,4),(10,8),(19,4)),
-        ((0,11),(5,11),(5,5),(16,5),(16,11),(21,11),(21,17),(0,17),(0,11)),
-        ((0,10),(5,13),(17,13),(22,8),(18,17),(4,17),(0,10)),
-        ((0,11),(12,11),(20,5),(17,11),(20,17),(13,13),(3,16),(0,11)),
-        ((1,15),(1,10),(17,10),(21,15),(1,15),(6,6),(16,6),(18,10)),
-        ((5,3),(18,3),(18,11),(11,17),(5,11),(5,3)),
-    )
-    p.path(tuple((x+a,y+b) for a,b in marks[index]), ink, 1.2)
+def briefs(p, edition, colors):
+    x = 357
+    p.rule(x, 741, RIGHT-x, BLACK, 1)
+    p.text("Also on Sunday", "display22", x, 760, .94)
+    p.text("REPORTS 16-37   /   STATUS & SOURCE AT RIGHT", "news12", RIGHT, 759, .86,
+           align=1, ink=MUTED)
+    for i, (region, tag, title, source) in enumerate(edition["briefs"]):
+        col, row = divmod(i, 11)
+        left = x+col*322
+        y = 775+row*14.1
+        p.box(left, y-7.5, 2.4, 8, colors[region])
+        p.text(f"{i+16:02d}", "news12", left+6, y, .87, ink=colors[region])
+        meta = f"{tag} / {source}"
+        meta_w = measure(p, meta, "news12", .65)
+        p.text(title, "news12", left+24, y, .91, limit=282-meta_w)
+        p.text(meta, "news12", left+314, y, .65, align=1, ink=MUTED)
+        p.rule(left, y+3.8, 314, FAINT, .52)
 
 
-def compose(data):
-    if len(data["leads"]) != 3 or len(data["desk"]) != 8:
-        raise ValueError("The edition needs three lead stories and eight illustrated reports")
-    if len(data["briefs"]) != 3 or any(len(items) != 8 for _, _, items in data["briefs"]):
-        raise ValueError("Each of the three lower columns needs eight briefs")
-    if not 4 <= len(data["numbers"]) <= 6 or len(data["markets"]) != 4:
-        raise ValueError("Unexpected number of figures or market references")
+def footer(p, edition):
+    p.box(LEFT, 928, PAGE, 38, PALETTE["paper"])
+    p.frame(LEFT, 928, PAGE, 38, RED)
+    p.text("DATE CHECK", "display22", LEFT+10, 950, .75, ink=RED)
+    p.box(LEFT+130, 935, .7, 23, RULE)
+    for i, line in enumerate(edition["date_check"]):
+        p.text(line, "news12", LEFT+141, 943+i*13, .90, limit=PAGE-152)
+    p.rule(LEFT, 975, PAGE, BLACK, 1.25)
+    p.text("MARKETS", "display22", LEFT, 991, .70, ink=MUTED)
+    p.text("FRI 20 NOV", "news12", LEFT, 1004, .84, ink=MUTED)
+    for i, (label,value) in enumerate(edition["markets"]):
+        x = LEFT+116+i*130
+        p.box(x, 981, .7, 25, RULE)
+        p.text(label, "news12", x+9, 990, .82, ink=MUTED)
+        p.text(value, "display22", x+9, 1006, .69, ink=RED)
+    p.text("ORIGINAL SCENE ILLUSTRATIONS", "news12", RIGHT, 991, .82, align=1, ink=MUTED)
+    p.text("DATES CHECKED IN LOCAL TIME AND UTC", "news12", RIGHT, 1004, .82, align=1, ink=MUTED)
+
+
+def compose(edition):
+    if tuple(len(edition[k]) for k in ("leads", "cards", "briefs")) != (3, 12, 22):
+        raise ValueError("Unexpected number of lead stories, cards or briefs")
+    colors = {region: PALETTE[hue+"30"] for region,hue in edition["regions"]}
+    counts = dict.fromkeys(colors, 0)
+    for region in [row["region"] for row in edition["leads"]] + [
+            row[0] for row in edition["cards"]+edition["briefs"]]:
+        counts[region] += 1
     p = Press()
-    p.rule(29, 22, 966, 1, 2)
-    p.text("THE WORLD DISPATCH", "display22", 31, 46, .95, ink=2)
-    p.text("INTERNATIONAL EDITION", "news12", 993, 44, 1.12, align=1, ink=3)
-    p.rule(30, 53, 964, 5)
-    p.text("22 NOVEMBER 2026", "display55", 512, 118, 1.49, .95, .5, wear=True, limit=960)
-    p.text(data["summary"], "news14", 512, 145, 1.19, align=.5, limit=952)
-    p.rule(30, 155, 964, 1, 1.5)
-    cells = data["numbers"]
-    width = 964 / len(cells)
-    for i, (value, title) in enumerate(cells):
-        x = 30 + width*i
-        if i:
-            p.box(x, 161, 1, 52, 5)
-        p.text(value, "display27", x+width/2, 189, 1.11, align=.5, ink=2, limit=width-18)
-        p.text(title, "news12", x+width/2, 205, 1.05, align=.5, limit=width-12)
-    p.rule(30, 219, 964, 1, 1.5)
-
-    dimensions = ((30,414),(461,258),(736,258))
-    for index, (article, (x,w)) in enumerate(zip(data["leads"], dimensions, strict=True)):
-        label, titles, body, source = article
-        p.text(f"0{index+1}  /  {label}", "news12", x+1, 240, 1.22, ink=2 if index == 0 else 3)
-        FIGURES[index](p, x+1, 247, w-2, 126)
-        for row, title in enumerate(titles):
-            p.text(title, "display55" if index == 0 else "display27", x, 408+row*30,
-                   .77 if index == 0 else 1.08, .95, wear=True, limit=w-4)
-        for row, line in enumerate(body):
-            p.text(line, "news14", x+1, 461+row*16, 1.11, limit=w-5)
-        p.text(source, "news12", x+1, 510, .96, ink=3, limit=w-4)
-        if index < 2:
-            p.box(x+w+8, 231, .8, 283, 5)
-
-    p.rule(30, 518, 964, 1, 1.6)
-    p.text("Around the World", "display27", 30, 545, 1.13)
-    p.text("REPORTS 04-11", "news12", 669, 544, .94, align=1, ink=3)
-    for index, (section, title, detail) in enumerate(data["desk"]):
-        row, col = divmod(index, 2)
-        x, y = 30+col*326, 553+row*52
-        color = SECTION[section]
-        p.rule(x, y, 310, 5, .9)
-        desk_mark(p, x+2, y+14, index, color)
-        p.text(f"{index+4:02} / {section.upper()}", "news12", x+31, y+12, .92, ink=color)
-        p.text(title, "display22", x+30, y+29, .87, limit=280)
-        p.text(detail, "news14", x+31, y+44, 1.03, limit=280)
-    world_map(p)
-    p.frame(688, 645, 304, 108)
-    p.text(data["market_label"], "news12", 697, 662, 1.02, ink=3, limit=278)
-    for row, (name, value) in enumerate(data["markets"]):
-        y = 680+18*row
-        p.rule(698, y-11, 284, 6, .75)
-        p.text(name, "news14", 700, y, 1.01)
-        p.text(value, "news14", 979, y, 1.07, align=1, ink=2)
-
-    p.rule(30, 767, 964, 1, 1.6)
-    for col, (name, category, items) in enumerate(data["briefs"]):
-        x = 30+col*326
-        color = SECTION[category]
-        p.rule(x, 774, 312, color, 3)
-        p.text(name, "display22", x, 800, 1.07, ink=color)
-        for row, item in enumerate(items):
-            y = 820+23*row
-            p.text(str(12+col*8+row), "news12", x+1, y, .93, ink=color)
-            p.text(item, "news14", x+23, y, 1.08, limit=288)
-            p.rule(x, y+6, 310, 5, .68)
-    p.text("SUNDAY  /  22 NOV 2026", "news12", 30, 1009, .95, ink=3)
-    p.text("DATES CHECKED IN LOCAL TIME AND UTC", "news12", 994, 1009, .95, align=1, ink=3)
+    masthead(p, edition, counts, colors)
+    leading_stories(p, edition, colors)
+    illustrated_desk(p, edition, colors)
+    world_map(p, edition, colors)
+    briefs(p, edition, colors)
+    footer(p, edition)
     return p.plate
 
 
@@ -310,7 +357,7 @@ def paper_tone(random, x, y):
     aging = max(0, 26-edge) * (3 + ((x*19 + y*31) % 5)) // 14
     if edge < 15 and (x + y*3) % 13 == 0:
         aging += 4
-    grain = random.randrange(6) - 3
+    grain = random.randrange(4) - 2
     return min(11, max(-40, grain + stain - aging - fold))
 
 
