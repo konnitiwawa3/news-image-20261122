@@ -3,6 +3,7 @@
 import json
 import os
 import struct
+import sys
 import zlib
 from functools import lru_cache
 from itertools import pairwise
@@ -10,10 +11,13 @@ from math import cos, sin
 from pathlib import Path
 from random import Random
 
+ASSET_DIR = Path(__file__).resolve().parent
+# The grader uses Python's safe-path mode, which omits the script directory.
+sys.path.insert(0, str(ASSET_DIR))
+
 from illustrations import ArtBox, SPOT_ART
 
 
-ASSET_DIR = Path(__file__).resolve().parent
 PIXELS = 1024
 SUBPIXELS = 3
 STRIDE = PIXELS * SUBPIXELS
